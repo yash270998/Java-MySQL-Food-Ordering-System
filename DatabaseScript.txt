@@ -1,0 +1,81 @@
+CREATE TABLE `orders` (
+  `order_id` int(11) NOT NULL,
+  `cust_name` varchar(45) DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  `starters` varchar(60) DEFAULT NULL,
+  `maincourse` varchar(60) DEFAULT NULL,
+  `dessert` varchar(60) DEFAULT NULL,
+  `startersqtyl` int(11) DEFAULT NULL,
+  `maincourseqty` int(11) DEFAULT NULL,
+  `dessertqty` int(11) DEFAULT NULL,
+  `billamount` float DEFAULT NULL,
+  PRIMARY KEY (`order_id`)
+)
+
+CREATE TABLE `bills` (
+  `billsid` int(11) NOT NULL,
+  `Customer` varchar(45) NOT NULL,
+  `BillAmount` float NOT NULL,
+  PRIMARY KEY (`billsid`)
+)
+
+
+
+Trigger:
+
+CREATE TRIGGER billsadded
+    AFTER INSERT ON orders
+    FOR EACH ROW
+BEGIN
+    INSERT INTO bills(billsid,Customer,BillAmount)
+		Values(
+       NEW.order_id,
+        NEW.cust_name,
+        NEW.billamount
+        );
+END$$;
+DELIMITER ;
+
+Procedures:
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `showavgbill`(in tdate date)
+BEGIN
+	Select AVG(billamount) from orders where date = tdate;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `showcustomers`()
+BEGIN
+	Select cust_name from orders;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `showearnings`(in tdate date)
+BEGIN
+	Select billamount from orders where date = tdate;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `showfulldata`()
+BEGIN
+Select * from orders;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `showquantities`(in tdate date)
+BEGIN
+Select Sum(startersqtyl) , Sum(maincourseqty), Sum(dessertqty) from orders where date = tdate;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `showstarters`(in tdate date)
+BEGIN
+	Select starters from orders where date = tdate;
+END$$
+DELIMITER ;
